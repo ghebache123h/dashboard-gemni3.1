@@ -19,8 +19,8 @@ services:
   dashboard:
     build: .
     container_name: analytics-dashboard
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       # This exactly matches the PostgreSQL credentials above 
       DATABASE_URL: "postgresql://dokploy:secure_dokploy_pass_123@db:5432/analytics?schema=public"
