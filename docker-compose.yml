@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: analytics-db
+    environment:
+      POSTGRES_USER: analytics_user
+      POSTGRES_PASSWORD: secure_analytics_password
+      POSTGRES_DB: whatsapp_analytics
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  dashboard:
+    build: .
+    container_name: analytics-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://analytics_user:secure_analytics_password@db:5432/whatsapp_analytics?schema=public"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  pgdata:

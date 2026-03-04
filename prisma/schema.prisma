@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Conversation {
+  id            String    @id @default(uuid())
+  whatsappNum   String?   // Hashed or raw identifier
+  status        String    @default("open") // open, closed, escalated
+  intent        String?   // e.g., 'disney_support', 'general'
+  startedAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  messages      Message[]
+  events        Event[]
+}
+
+model Message {
+  id             String    @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role           String    // 'user', 'ai', 'system'
+  content        String?
+  
+  // Token tracking for AI messages
+  inputTokens    Int       @default(0)
+  outputTokens   Int       @default(0)
+  
+  createdAt      DateTime  @default(now())
+}
+
+model Event {
+  id             String    @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  eventType      String    // 'OTP_REQUEST', 'OTP_SUCCESS', 'OTP_FAILED', 'RATE_LIMIT_HIT', 'ESCALATION'
+  eventData      String?   // Flexible metadata stored as stringified JSON
+  
+  createdAt      DateTime  @default(now())
+}
+
+model Settings {
+  id               String   @id @default("default")
+  inputTokenPrice  Float    @default(0.50) // Price per 1M tokens
+  outputTokenPrice Float    @default(1.50) // Price per 1M tokens
+  updatedAt        DateTime @updatedAt
+}
