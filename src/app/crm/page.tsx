@@ -20,64 +20,116 @@ export default async function CrmPage() {
     });
 
     return (
-        <main className="min-h-screen bg-slate-50 p-8">
-            <div className="max-w-7xl mx-auto space-y-8">
-                <header className="flex justify-between items-center">
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+            {/* Header */}
+            <header style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">CRM / Escalation Dashboard</h1>
-                        <p className="text-slate-500 mt-1">Monitor users who required human support</p>
+                        <h1 style={{
+                            fontSize: '28px',
+                            fontWeight: 700,
+                            color: 'var(--text-highlight)',
+                            margin: 0,
+                            letterSpacing: '-0.02em',
+                        }}>
+                            Escalation Monitor
+                        </h1>
+                        <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                            Track conversations handed off to human support
+                        </p>
                     </div>
-                    <div className="flex gap-4">
-                        <a href="/" className="bg-white border rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-50 shadow-sm transition">
-                            Back to Dashboard
-                        </a>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="badge-danger" style={{ padding: '6px 14px', borderRadius: '99px', fontSize: '13px', fontWeight: 600 }}>
+                            {escalatedEvents.length} escalation{escalatedEvents.length !== 1 ? 's' : ''}
+                        </div>
                     </div>
-                </header>
+                </div>
+            </header>
 
-                <section className="bg-white rounded-xl border p-6 shadow-sm overflow-hidden">
-                    <table className="min-w-full divide-y divide-slate-200">
-                        <thead className="bg-slate-50">
+            {/* Table */}
+            <div className="glass-card" style={{ overflow: 'hidden' }}>
+                {escalatedEvents.length > 0 ? (
+                    <table className="data-table">
+                        <thead>
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Time</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Conversation ID</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Intent</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Recent Msg Preview</th>
+                                <th>Time</th>
+                                <th>Conversation</th>
+                                <th>Status</th>
+                                <th>Intent</th>
+                                <th>Last Message</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-slate-200">
-                            {escalatedEvents.map((event) => {
+                        <tbody>
+                            {escalatedEvents.map((event, idx) => {
                                 const firstMsg = event.conversation.messages.find(m => m.role === 'user');
                                 return (
-                                    <tr key={event.id} className="hover:bg-slate-50 transition">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                            {format(new Date(event.createdAt), 'MMM d, yyyy HH:mm')}
+                                    <tr key={event.id} className="animate-in" style={{ animationDelay: `${idx * 0.03}s` }}>
+                                        <td>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                <span style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: 500 }}>
+                                                    {format(new Date(event.createdAt), 'MMM d, yyyy')}
+                                                </span>
+                                                <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
+                                                    {format(new Date(event.createdAt), 'HH:mm:ss')}
+                                                </span>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                            ...{event.conversationId.slice(-8)}
+                                        <td>
+                                            <code style={{
+                                                fontSize: '12px',
+                                                fontFamily: 'var(--font-mono)',
+                                                background: 'var(--bg-surface)',
+                                                padding: '3px 8px',
+                                                borderRadius: '4px',
+                                                color: 'var(--accent-blue)',
+                                                border: '1px solid var(--border-color)',
+                                            }}>
+                                                ...{event.conversationId.slice(-8)}
+                                            </code>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <td>
+                                            <span className="badge badge-danger">
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6" /></svg>
+                                                Escalated
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span className="badge badge-purple" style={{ padding: '4px 10px' }}>
                                                 {event.conversation.intent || 'Unknown'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">
-                                            {firstMsg ? firstMsg.content : 'No user message recorded'}
+                                        <td>
+                                            <div style={{
+                                                maxWidth: '300px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                fontSize: '13px',
+                                                color: 'var(--text-secondary)',
+                                            }}>
+                                                {firstMsg ? firstMsg.content : (
+                                                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No message recorded</span>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
-                                )
+                                );
                             })}
-
-                            {escalatedEvents.length === 0 && (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-sm text-slate-500">
-                                        No escalations recorded yet.
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
-                </section>
+                ) : (
+                    <div className="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                            <line x1="17" y1="11" x2="23" y2="11" />
+                        </svg>
+                        <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-secondary)' }}>No escalations yet</div>
+                        <div style={{ fontSize: '13px', marginTop: '6px' }}>
+                            Conversations requiring human support will appear here
+                        </div>
+                    </div>
+                )}
             </div>
-        </main>
+        </div>
     );
 }
