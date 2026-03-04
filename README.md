@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Support Analytics Dashboard
 
-## Getting Started
+This is a Next.js 14 dashboard built to receive webhook telemetry from n8n workflows and display KPIs regarding Token Cost, OTP Success rates, and an Escalation Support CRM.
 
-First, run the development server:
+## Deployment with Dokploy (VPS)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project is already pre-configured for a seamless deployment using Dokploy on your VPS.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Prerequisites in Dokploy
+1. Create a **PostgreSQL Database** in Dokploy.
+2. Note the generated `DATABASE_URL` connection string.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Deploying the App
+1. Go to **Applications** in Dokploy and create a new App.
+2. Connect this GitHub repository: `ghebache123h/dashboard-gemni3.1`.
+3. Set the Environment variable:
+   - `DATABASE_URL="your-postgresql-url-here"`
+4. In the Deployment Settings, Dokploy will automatically detect the **Dockerfile**.
+5. Click **Deploy**. Dokploy will build the standalone Next.js image securely and start it.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+*(Note: Prisma automatically generates the client during build due to the `postinstall` script. You must run `npx prisma db push` manually via Dokploy's terminal or run it locally pointed to your production DB to initialize the tables the first time).*
 
-## Learn More
+## Local Development (Testing)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If you are running this locally without Docker:
+1. Change `provider = "postgresql"` to `provider = "sqlite"` in `prisma/schema.prisma`.
+2. Change `url = env("DATABASE_URL")` to `url = "file:./dev.db"`.
+3. Run `npm install`
+4. Run `npx prisma db push`
+5. Run `npm run dev`
