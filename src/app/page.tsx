@@ -1,6 +1,8 @@
 import prisma from '@/lib/prisma';
 import { Card } from './components/Card';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const [
     totalConversations,
