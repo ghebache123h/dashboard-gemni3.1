@@ -2,23 +2,22 @@
 
 This is a Next.js 14 dashboard built to receive webhook telemetry from n8n workflows and display KPIs regarding Token Cost, OTP Success rates, and an Escalation Support CRM.
 
-## Deployment with Dokploy (VPS)
+## Deployment with Dokploy (VPS) - All-In-One Docker Compose
 
-This project is already pre-configured for a seamless deployment using Dokploy on your VPS.
+This project is fully configured to be deployed as a single, all-in-one Compose Application inside Dokploy. It will automatically build and spin up both the **Analytics Dashboard** and a bundled **PostgreSQL Database** for you.
 
-### Prerequisites in Dokploy
-1. Create a **PostgreSQL Database** in Dokploy.
-2. Note the generated `DATABASE_URL` connection string.
+### How to Deploy
+1. Go to **Applications** in Dokploy.
+2. Under "Type", select **Compose**.
+3. Create the application.
+4. Select **Github** and link your repository: `ghebache123h/dashboard-gemni3.1`.
+5. Specify the internal paths:
+   - Compose Path: `docker-compose.yml`
+6. Click **Deploy**. 
 
-### Deploying the App
-1. Go to **Applications** in Dokploy and create a new App.
-2. Connect this GitHub repository: `ghebache123h/dashboard-gemni3.1`.
-3. Set the Environment variable:
-   - `DATABASE_URL="your-postgresql-url-here"`
-4. In the Deployment Settings, Dokploy will automatically detect the **Dockerfile**.
-5. Click **Deploy**. Dokploy will build the standalone Next.js image securely and start it.
+Dokploy will read the `docker-compose.yml` file, pull the PostgreSQL image, and build the Next.js Dockerfile cleanly. The startup scripts included will automatically format your database schema.
 
-*(Note: Prisma automatically generates the client during build due to the `postinstall` script. You must run `npx prisma db push` manually via Dokploy's terminal or run it locally pointed to your production DB to initialize the tables the first time).*
+*(Note: There is no need to create a separate database service in Dokploy! Everything is bundled inside this repo using Compose).*
 
 ## Local Development (Testing)
 

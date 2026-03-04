@@ -1,16 +1,21 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:15-alpine
     container_name: analytics-db
     environment:
-      POSTGRES_USER: analytics_user
-      POSTGRES_PASSWORD: secure_analytics_password
-      POSTGRES_DB: whatsapp_analytics
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: dokploy
+      POSTGRES_PASSWORD: secure_dokploy_pass_123
+      POSTGRES_DB: analytics
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dokploy -d analytics"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   dashboard:
     build: .
@@ -18,10 +23,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: "postgresql://analytics_user:secure_analytics_password@db:5432/whatsapp_analytics?schema=public"
+      # This exactly matches the PostgreSQL credentials above 
+      DATABASE_URL: "postgresql://dokploy:secure_dokploy_pass_123@db:5432/analytics?schema=public"
     depends_on:
-      - db
-    restart: unless-stopped
+      db:
+        condition: service_healthy
+    restart: always
 
 volumes:
   pgdata:
