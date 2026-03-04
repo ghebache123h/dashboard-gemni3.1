@@ -23,8 +23,8 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Install prisma globally to run db push safely at runtime
-RUN npm install -g prisma
+# Install prisma CLI (pinned to match project version) for runtime db push
+RUN npm install -g prisma@6.4.1
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
